@@ -1,3 +1,6 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  root "calendar#index"
+  get "/calendar", to: "calendar#index"
+
+  get "/training/:date/:time", to: "training#details"
 end

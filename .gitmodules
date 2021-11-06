@@ -1,0 +1,3 @@
+[submodule "lib/polar"]
+	path = lib/polar
+	url = https://github.com/cmaion/polar.git

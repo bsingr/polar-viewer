@@ -83,10 +83,13 @@ GEM
     ffi (1.15.4)
     globalid (0.5.2)
       activesupport (>= 5.0)
+    google-protobuf (3.19.1-x86_64-linux)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
     jbuilder (2.11.2)
       activesupport (>= 5.0.0)
+    libusb (0.6.4-x86_64-linux)
+      ffi (~> 1.0)
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -147,6 +150,8 @@ GEM
       ffi (~> 1.0)
     regexp_parser (2.1.1)
     rexml (3.2.5)
+    rubyserial (0.6.0)
+      ffi (~> 1.9, >= 1.9.3)
     rubyzip (2.3.2)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
@@ -207,11 +212,15 @@ DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
   capybara (>= 3.26)
+  google-protobuf
   jbuilder (~> 2.7)
+  libusb
   listen (~> 3.3)
+  nokogiri
   puma (~> 5.0)
   rack-mini-profiler (~> 2.0)
   rails (~> 6.1.4, >= 6.1.4.1)
+  rubyserial
   sass-rails (>= 6)
   selenium-webdriver
   spring
