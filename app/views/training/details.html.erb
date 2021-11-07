@@ -6,3 +6,28 @@
 <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
 <p><%= pb_duration_to_string @training_session.duration %></p>
 
+<canvas id="heart_rate_chart" width="800" height="300"></canvas>
+<canvas id="pace_chart" width="800" height="300"></canvas>
+<canvas id="distance_chart" width="800" height="300"></canvas>
+
+<%= javascript_pack_tag 'training' %>
+
+<script type="text/javascript">
+    var chartData = <%= @chart_data.to_json.html_safe %>;
+
+    const labels = [];
+    const heartRateData = [];
+    const paceData = [];
+    const distanceData = [];
+    for (const data of chartData) {
+        labels.push(data.time);
+        heartRateData.push(data.heart_rate);
+        paceData.push(data.pace);
+        distanceData.push(data.distance);
+    }
+
+    drawChart('heart_rate_chart', labels, heartRateData);
+    drawChart('pace_chart', labels, paceData);
+    drawChart('distance_chart', labels, distanceData);
+</script>
+
