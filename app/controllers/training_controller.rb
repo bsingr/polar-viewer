@@ -13,7 +13,7 @@ class TrainingController < ApplicationController
       return false
     end
 
-    @directory = "#{File.dirname(__FILE__)}/../../../synch/U/0/#{date}/E/#{time}"
+    @directory = "#{File.dirname(__FILE__)}/../../synch/U/0/#{date}/E/#{time}"
 
     if !Dir.exists?(@directory)
       render status: :not_found

@@ -3,15 +3,16 @@ import moment from 'moment';
 
 Chart.register(LinearScale, LineController, CategoryScale, LineElement, PointElement);
 
-window.drawChart = function(id, labels, data) {
+window.drawChart = function (id, label, labels, data, color) {
     const context = document.getElementById(id).getContext('2d');
     const chart = new Chart(context, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Heart Rate',
+                label: label,
                 data: data,
+                borderColor: color
             }]
         },
         options: {
@@ -20,8 +21,12 @@ window.drawChart = function(id, labels, data) {
                 y: {
                     beginAtZero: true
                 }
-            }
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
         }
     });
 }
-
