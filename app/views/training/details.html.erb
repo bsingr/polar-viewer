@@ -1,33 +1,38 @@
-<h1>Training#details</h1>
-<p>directory: <%= @directory %></p>
+<%= link_to 'Back', training_times_path(@date) %>
 
-<p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
-<p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
-<p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
-<p><%= pb_duration_to_string @training_session.duration %></p>
+<% if @sport %>
+  <h1>Training#details</h1>
 
-<canvas id="heart_rate_chart" width="800" height="300"></canvas>
-<canvas id="pace_chart" width="800" height="300"></canvas>
-<canvas id="distance_chart" width="800" height="300"></canvas>
+  <p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
+  <p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
+  <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
+  <p><%= pb_duration_to_string @training_session.duration %></p>
 
-<%= javascript_pack_tag 'training' %>
+  <canvas id="heart_rate_chart" width="800" height="300"></canvas>
+  <canvas id="pace_chart" width="800" height="300"></canvas>
+  <canvas id="distance_chart" width="800" height="300"></canvas>
 
-<script type="text/javascript">
-    var chartData = <%= @chart_data.to_json.html_safe %>;
+  <%= javascript_pack_tag 'training' %>
 
-    const labels = [];
-    const heartRateData = [];
-    const paceData = [];
-    const distanceData = [];
-    for (const data of chartData) {
-        labels.push(data.time);
-        heartRateData.push(data.heart_rate);
-        paceData.push(data.pace);
-        distanceData.push(data.distance);
-    }
+  <script type="text/javascript">
+      var chartData = <%= @chart_data.to_json.html_safe %>;
 
-    drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
-    drawChart('pace_chart', 'Distance', labels, paceData, 'green');
-    drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
-</script>
+      const labels = [];
+      const heartRateData = [];
+      const paceData = [];
+      const distanceData = [];
+      for (const data of chartData) {
+          labels.push(data.time);
+          heartRateData.push(data.heart_rate);
+          paceData.push(data.pace);
+          distanceData.push(data.distance);
+      }
+
+      drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
+      drawChart('pace_chart', 'Distance', labels, paceData, 'green');
+      drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
+  </script>
+<% else %>
+  <p>No exercise found</p>
+<% end %>
 

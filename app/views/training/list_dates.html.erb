@@ -1,0 +1,11 @@
+<% if @dates %>
+  <ul>
+    <% @dates.each do |date| %>
+      <li>
+        <%= link_to date, training_times_path(date) %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No dates found</p>
+<% end %>

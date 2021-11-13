@@ -1,0 +1,14 @@
+<%= link_to 'Back', training_dates_path() %>
+
+<% if @times %>
+  <ul>
+    <% @times.each do |time| %>
+      <li>
+        <%= link_to time, training_details_path(@date, time) %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No exercises found</p>
+<% end %>
+

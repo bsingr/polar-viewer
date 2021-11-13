@@ -1,11 +1,55 @@
 require "#{File.dirname(__FILE__)}/../../lib/polar/lib/polar_data_parser"
 
 class TrainingController < ApplicationController
+  def get_directory()
+    return "#{File.dirname(__FILE__)}/../../synch/U/0"
+  end
+
+  def get_date_directory(date)
+    return "#{self.get_directory()}/#{date}/E"
+  end
+
+  def get_time_directory(date, time)
+    return "#{self.get_date_directory(date)}/#{time}"
+  end
+
+  def is_valid_date(date)
+    return /^\d{8}$/ =~ date
+  end
+
+  def is_valid_time(time)
+    return /^\d{6}$/ =~ time
+  end
+
+  def list_dates
+    directory = self.get_directory()
+    if !Dir.exists?(directory)
+      render status: :not_found
+      return false
+    end
+
+    entries = Dir.entries(directory)
+    @dates = entries.select {|entry| self.is_valid_date(entry) }
+  end
+
+  def list_times
+    @date = params[:date]
+
+    directory = self.get_date_directory(@date)
+    if !Dir.exists?(directory)
+      render status: :not_found
+      return false
+    end
+
+    entries = Dir.entries(directory)
+    @times = entries.select {|entry| self.is_valid_time(entry) }
+  end
+
   def details
-    date = params[:date]
+    @date = params[:date]
     time = params[:time]
 
-    date_is_valid = /^\d{8}$/ =~ date
+    date_is_valid = /^\d{8}$/ =~ @date
     time_is_valid = /^\d{6}$/ =~ time
 
     if !date_is_valid || !time_is_valid
@@ -13,14 +57,14 @@ class TrainingController < ApplicationController
       return false
     end
 
-    @directory = "#{File.dirname(__FILE__)}/../../synch/U/0/#{date}/E/#{time}"
+    directory = self.get_time_directory(@date, time)
 
-    if !Dir.exists?(@directory)
+    if !Dir.exists?(directory)
       render status: :not_found
       return false
     end
 
-    parsed = PolarDataParser.parse_training_session(@directory)
+    parsed = PolarDataParser.parse_training_session(directory)
 
     @sport = parsed[:sport]
     @training_session = parsed[:training_session]
