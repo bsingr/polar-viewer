@@ -29,7 +29,7 @@ class TrainingController < ApplicationController
     end
 
     entries = Dir.entries(directory)
-    @dates = entries.select {|entry| self.is_valid_date(entry) }
+    @dates = entries.select {|entry| self.is_valid_date(entry) }.sort
   end
 
   def list_times
@@ -42,7 +42,7 @@ class TrainingController < ApplicationController
     end
 
     entries = Dir.entries(directory)
-    @times = entries.select {|entry| self.is_valid_time(entry) }
+    @times = entries.select {|entry| self.is_valid_time(entry) }.sort
   end
 
   def details
