@@ -1,38 +1,58 @@
+
 <%= link_to 'Back', training_times_path(@date) %>
 
 <% if @sport %>
-  <h1>Training#details</h1>
+    <h1>Training#details</h1>
 
-  <p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
-  <p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
-  <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
-  <p><%= pb_duration_to_string @training_session.duration %></p>
+    <p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
+    <p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
+    <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
+    <p><%= pb_duration_to_string @training_session.duration %></p>
 
-  <canvas id="heart_rate_chart" width="800" height="300"></canvas>
-  <canvas id="pace_chart" width="800" height="300"></canvas>
-  <canvas id="distance_chart" width="800" height="300"></canvas>
+    <h2>Heart rate</h2>
+    <canvas id="heart_rate_chart" width="800" height="300"></canvas>
 
-  <%= javascript_pack_tag 'training' %>
+    <h2>Pace</h2>
+    <canvas id="pace_chart" width="800" height="300"></canvas>
 
-  <script type="text/javascript">
-      var chartData = <%= @chart_data.to_json.html_safe %>;
+    <h2>Distance</h2>
+    <canvas id="distance_chart" width="800" height="300"></canvas>
+    <div id="map" style="width: 600px; height: 600px;"></div>
 
-      const labels = [];
-      const heartRateData = [];
-      const paceData = [];
-      const distanceData = [];
-      for (const data of chartData) {
-          labels.push(data.time);
-          heartRateData.push(data.heart_rate);
-          paceData.push(data.pace);
-          distanceData.push(data.distance);
-      }
+    <%= javascript_pack_tag "training" %>
 
-      drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
-      drawChart('pace_chart', 'Distance', labels, paceData, 'green');
-      drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
-  </script>
+    <script type="text/javascript">
+        var chartData = <%= @chart_data.to_json.html_safe %>;
+        var gpsTrackPositions = <%= @gps_track_positions.to_json.html_safe %>;
+
+        const labels = [];
+        const heartRateData = [];
+        const paceData = [];
+        const distanceData = [];
+        for (const data of chartData) {
+            labels.push(data.time);
+            heartRateData.push(data.heart_rate);
+            paceData.push(data.pace);
+            distanceData.push(data.distance);
+        }
+
+        drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
+        drawChart('pace_chart', 'Distance', labels, paceData, 'green');
+        drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
+
+        if (gpsTrackPositions.length > 0) {
+            const map = L.map('map');
+            const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            });
+            tileLayer.addTo(map);
+
+            const gpsTrack = L.polyline(gpsTrackPositions, {color: 'red'})
+            gpsTrack.addTo(map);
+            map.fitBounds(gpsTrack.getBounds());
+        }
+    </script>
 <% else %>
-  <p>No exercise found</p>
+    <p>No exercise found</p>
 <% end %>
 

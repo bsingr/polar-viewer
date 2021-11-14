@@ -117,6 +117,19 @@ class TrainingController < ApplicationController
       #r << "moving type=#{samples.moving_type_samples[i]}" if samples.moving_type_samples[i]
     end
 
+    gps_track_positions = Array.new
+
+    route_samples_count = @route_samples.latitude.count
+    if route_samples_count > 0
+      for i in 0..route_samples_count-1
+        gps_track_positions.append([
+          @route_samples.latitude[i],
+          @route_samples.longitude[i]
+        ])
+      end
+    end
+
     @chart_data = chart_data
+    @gps_track_positions = gps_track_positions
   end
 end
