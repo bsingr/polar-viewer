@@ -10,12 +10,16 @@
     <p><%= pb_duration_to_string @training_session.duration %></p>
 
     <h2>Heart rate</h2>
+    <% if @training_session.heart_rate %>
+      <p>&Oslash; <%= @training_session.heart_rate.average %>; max <%= @training_session.heart_rate.maximum %></p>
+    <% end %>
     <canvas id="heart_rate_chart" width="800" height="300"></canvas>
 
     <h2>Pace</h2>
     <canvas id="pace_chart" width="800" height="300"></canvas>
 
     <h2>Distance</h2>
+    <p>total <%= "%.1f" % @training_session.distance %>m</p>
     <canvas id="distance_chart" width="800" height="300"></canvas>
     <div id="map" style="width: 600px; height: 600px;"></div>
 
