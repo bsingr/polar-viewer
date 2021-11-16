@@ -73,6 +73,7 @@ class TrainingController < ApplicationController
     @route_samples = parsed[:route_samples]
     @swimming_samples = parsed[:swimming_samples]
     @laps = parsed[:exercise_laps]
+    @exercise_stats = parsed[:exercise_stats]
 
     recording_interval = @samples.recording_interval.hours * 3600 + @samples.recording_interval.minutes * 60 + @samples.recording_interval.seconds + (@samples.recording_interval.millis.to_f / 1000)
     samples_count = @samples.speed_samples.count
@@ -81,9 +82,9 @@ class TrainingController < ApplicationController
     for i in 0..samples_count-1
       timestamp += recording_interval
 
-      heart_rate = 1
+      heart_rate = 0
       distance = 0
-      pace = 1
+      pace = 0
 
       if @samples.heart_rate_samples[i]
         heart_rate = @samples.heart_rate_samples[i]
@@ -92,7 +93,9 @@ class TrainingController < ApplicationController
         distance = "%7.1f" % @samples.distance_samples[i]
       end
       if @samples.speed_samples[i]
-        pace = @samples.speed_samples[i]
+        if @samples.speed_samples[i] > 0
+          pace = @samples.speed_samples[i]
+        end
       end
 
       chart_data.append({

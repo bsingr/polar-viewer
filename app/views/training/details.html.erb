@@ -1,62 +1,90 @@
-
 <%= link_to 'Back', training_times_path(@date) %>
 
 <% if @sport %>
-    <h1>Training#details</h1>
+  <h1>Training#details</h1>
 
-    <p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
-    <p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
-    <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
-    <p><%= pb_duration_to_string @training_session.duration %></p>
+  <p><%= @sport.translation.map { |t| t.text.text if t.id.language == 'en' }.compact.join('/') %></p>
+  <p><%= pb_sysdatetime_to_string @training_session.start, @training_session.start.time_zone_offset %></p>
+  <p><%= pb_sysdatetime_to_string @training_session.end, @training_session.end.time_zone_offset %></p>
+  <p><%= pb_duration_to_string @training_session.duration %></p>
 
-    <h2>Heart rate</h2>
-    <% if @training_session.heart_rate %>
-      <p>&Oslash; <%= @training_session.heart_rate.average %>; max <%= @training_session.heart_rate.maximum %></p>
-    <% end %>
-    <canvas id="heart_rate_chart" width="800" height="300"></canvas>
+  <h2>Heart rate</h2>
+  <% if @exercise_stats.heart_rate %>
+    <p>
+    &Oslash; <%= @exercise_stats.heart_rate.average %>;
+    max <%= @exercise_stats.heart_rate.maximum %>
+    </p>
+  <% end %>
+  <canvas id="heart_rate_chart" width="800" height="300"></canvas>
 
-    <h2>Pace</h2>
-    <canvas id="pace_chart" width="800" height="300"></canvas>
+  <h2>Pace</h2>
+  <% if @exercise_stats.speed %>
+    <p>
+    &Oslash; <%= "%3.2f" % @exercise_stats.speed.average %> km/h;
+    max <%= "%3.2f" % @exercise_stats.speed.maximum %> km/h
+    </p>
+  <% end %>
+  <canvas id="pace_chart" width="800" height="300"></canvas>
 
-    <h2>Distance</h2>
-    <p>total <%= "%.1f" % @training_session.distance %>m</p>
-    <canvas id="distance_chart" width="800" height="300"></canvas>
-    <div id="map" style="width: 600px; height: 600px;"></div>
+  <h2>Distance</h2>
+  <p>total <%= "%.1f" % @training_session.distance %>m</p>
+  <canvas id="distance_chart" width="800" height="300"></canvas>
+  <div id="map" style="width: 600px; height: 600px;"></div>
 
-    <%= javascript_pack_tag "training" %>
+  <%= javascript_pack_tag "training" %>
 
-    <script type="text/javascript">
-        var chartData = <%= @chart_data.to_json.html_safe %>;
-        var gpsTrackPositions = <%= @gps_track_positions.to_json.html_safe %>;
+  <script type="text/javascript">
+    var chartData = <%= @chart_data.to_json.html_safe %>;
+    var gpsTrackPositions = <%= @gps_track_positions.to_json.html_safe %>;
 
-        const labels = [];
-        const heartRateData = [];
-        const paceData = [];
-        const distanceData = [];
-        for (const data of chartData) {
-            labels.push(data.time);
-            heartRateData.push(data.heart_rate);
-            paceData.push(data.pace);
-            distanceData.push(data.distance);
+    const labels = [];
+    const heartRateData = [];
+    const paceData = [];
+    const distanceData = [];
+    for (const data of chartData) {
+          labels.push(data.time);
+          heartRateData.push(data.heart_rate);
+          paceData.push(data.pace);
+          distanceData.push(data.distance);
         }
 
-        drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
-        drawChart('pace_chart', 'Distance', labels, paceData, 'green');
-        drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
+    drawChart('heart_rate_chart', 'Heart rate', labels, heartRateData, 'red');
+    drawChart('pace_chart', 'Distance', labels, paceData, 'green');
+    drawChart('distance_chart', 'Distance', labels, distanceData, 'blue');
 
-        if (gpsTrackPositions.length > 0) {
-            const map = L.map('map');
-            const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            });
-            tileLayer.addTo(map);
+    if (gpsTrackPositions.length > 0) {
+          var myIcon = L.icon({
+            iconUrl: '<%= image_path "marker-icon.png" %>',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            shadowUrl: '<%= image_path "marker-shadow.png" %>',
+            shadowSize: [41, 41],
+            shadowAnchor: [12, 41]
+          });
+          const map = L.map('map');
+          const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          });
+          tileLayer.addTo(map);
 
-            const gpsTrack = L.polyline(gpsTrackPositions, {color: 'red'})
-            gpsTrack.addTo(map);
-            map.fitBounds(gpsTrack.getBounds());
+          const gpsTrack = L.polyline(gpsTrackPositions, {
+            color: 'red',
+          });
+          let marker = L.marker([0, 0], {icon: myIcon});
+          gpsTrack.on('mouseover', e => {
+            marker.setLatLng(e.latlng);
+            if (!map.hasLayer(marker)) {
+              marker.addTo(map);
+            }
+          });
+          gpsTrack.on('mouseout', e => {
+            marker.removeFrom(map);
+          });
+          gpsTrack.addTo(map);
+          map.fitBounds(gpsTrack.getBounds());
         }
-    </script>
+  </script>
 <% else %>
-    <p>No exercise found</p>
+  <p>No exercise found</p>
 <% end %>
 
