@@ -61,3 +61,6 @@ gem 'libusb'
 gem 'rubyserial'
 gem 'nokogiri'
 
+# gemspec example
+gem 'foo', path: 'lib/foo'
+
